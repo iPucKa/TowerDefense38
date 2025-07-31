@@ -1,0 +1,31 @@
+﻿using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.UI.Gameplay.EndGamePopup;
+using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
+using System;
+
+namespace Assets._Project.Develop.Runtime.UI.Gameplay
+{
+	public class GameplayPresentersFactory
+	{
+		private readonly DIContainer _container;
+
+		public GameplayPresentersFactory(DIContainer container)
+		{
+			_container = container;
+		}
+
+		public EndGamePopupPresenter CreateEndGamePopupPresenter(EndGamePopupView view, string message)
+		{
+			return new EndGamePopupPresenter(
+				view,
+				_container.Resolve<ICoroutinesPerformer>(),
+				//_container.Resolve<GameplayCycle>(),
+				message);
+		}
+
+		public static implicit operator GameplayPresentersFactory(ProjectPresentersFactory v)
+		{
+			throw new NotImplementedException();
+		}
+	}
+}
