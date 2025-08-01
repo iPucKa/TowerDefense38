@@ -9,7 +9,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 	public class DealDamageOnAreaContactSystem : IInitializableSystem, IUpdatableSystem
 	{
 		private Entity _entity;
-		private ReactiveVariable<float> _currentHealth;
+		//private ReactiveVariable<float> _currentHealth;
 		private Buffer<Entity> _contacts;
 		private ReactiveVariable<float> _damage;
 
@@ -21,7 +21,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 			_damage = entity.AreaContactDamage;                                             // ТУТ УКАЗАТЬ ДАМАГ ОТ ВЗРЫВА 			
 
-			_currentHealth = entity.CurrentHealth;
+			//_currentHealth = entity.CurrentHealth;
 
 			_contacts = entity.AreaContactEntitiesBuffer;
 
@@ -41,8 +41,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 					EntitiesHelper.TryTakeDamageFrom(_entity, contactEntity, _damage.Value);
 
-					if(_currentHealth != null)
-						_currentHealth.Value = 0;                                            // ТУТ СРАЗУ ОБНУЛЯЮ ЗДОРОВЬЕ ПЕРЕДАННОЙ СУЩНОСТИ (если есть компонент здоровья)
+					//if(_currentHealth != null)
+					//	_currentHealth.Value = 0;                                            // ТУТ СРАЗУ ОБНУЛЯЮ ЗДОРОВЬЕ ПЕРЕДАННОЙ СУЩНОСТИ (если есть компонент здоровья)
 				}
 			}
 

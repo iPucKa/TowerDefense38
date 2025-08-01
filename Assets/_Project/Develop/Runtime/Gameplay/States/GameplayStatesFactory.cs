@@ -4,7 +4,6 @@ using Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
 using Assets._Project.Develop.Runtime.Gameplay.Progress;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
-using Assets._Project.Develop.Runtime.Meta.Features.LevelsProgression;
 using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
@@ -42,7 +41,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 		{
 			return new WinState(
 				_container.Resolve<IInputService>(),
-				_container.Resolve<LevelsProgressionService>(),
 				inputArgs,
 				_container.Resolve<PlayerDataProvider>(),
 				_container.Resolve<SceneSwitcherService>(),

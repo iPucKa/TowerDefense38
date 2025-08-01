@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: FortressConfig
   m_EditorClassIdentifier: 
   <PrefabPath>k__BackingField: Entities/Fortress
-  <MaxHealth>k__BackingField: 100
-  <AttackProcessTime>k__BackingField: 1.5
-  <AttackDelayTime>k__BackingField: 0.75
-  <AttackCooldown>k__BackingField: 1
-  <InstantAttackDamage>k__BackingField: 50
-  <DeathProcessTime>k__BackingField: 2
+  <ExplosionDamage>k__BackingField: 50
+  <ExplosionRadius>k__BackingField: 5
+  <AttackProcessTime>k__BackingField: 0
+  <AttackDelayTime>k__BackingField: 0
+  <AttackCooldown>k__BackingField: 0
+  <DeathProcessTime>k__BackingField: 1

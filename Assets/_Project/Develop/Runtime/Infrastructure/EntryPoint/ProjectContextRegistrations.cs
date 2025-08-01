@@ -1,6 +1,7 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.Progress;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Meta.Features.GameProgress;
+using Assets._Project.Develop.Runtime.Meta.Features.LevelsProgression;
 using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
 using Assets._Project.Develop.Runtime.UI;
 using Assets._Project.Develop.Runtime.UI.Core;
@@ -42,7 +43,12 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
 			container.RegisterAsSingle(CreateViewsFactory);
 			container.RegisterAsSingle(CreateProjectPresentersFactory);
 			container.RegisterAsSingle(CreateTimerServiceFactory);
+			//container.RegisterAsSingle(CreateLevelsProgressionService).NonLazy();
 		}
+
+		//Способ создания сервиса пройденных уровней
+		private static LevelsProgressionService CreateLevelsProgressionService(DIContainer c)
+			=> new LevelsProgressionService(c.Resolve<PlayerDataProvider>());
 
 		//Способ создания сервиса таймеров
 		private static TimerServiceFactory CreateTimerServiceFactory(DIContainer c)

@@ -3,7 +3,6 @@ using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
 using Assets._Project.Develop.Runtime.Gameplay.Progress;
 using Assets._Project.Develop.Runtime.Meta.Features.GameProgress;
-using Assets._Project.Develop.Runtime.Meta.Features.LevelsProgression;
 using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
@@ -25,7 +24,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 
 		public WinState(
 			IInputService inputService,
-			LevelsProgressionService levelsProgressionService,
 			GameplayInputArgs gameplayInputArgs,
 			PlayerDataProvider playerDataProvider,
 			SceneSwitcherService sceneSwitcherService,

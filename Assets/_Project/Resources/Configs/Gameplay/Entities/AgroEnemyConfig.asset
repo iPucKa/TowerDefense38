@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: AgroEnemyConfig
   m_EditorClassIdentifier: 
   <PrefabPath>k__BackingField: Entities/Ghost
-  <MoveSpeed>k__BackingField: 9
+  <MoveSpeed>k__BackingField: 0.2
   <RotationSpeed>k__BackingField: 900
   <MaxHealth>k__BackingField: 100
   <ExplosionDamage>k__BackingField: 50
-  <ExplosionRadius>k__BackingField: 2
-  <DeathProcessTime>k__BackingField: 2
+  <ExplosionRadius>k__BackingField: 1.5
+  <DeathProcessTime>k__BackingField: 0.1

@@ -9,8 +9,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 {
 	public class DealDamageOnAreaByEventSystem : IInitializableSystem, IDisposableSystem
 	{
-		private readonly Entity _owner;
-
 		private Entity _entity;
 		private ReactiveVariable<float> _currentHealth;
 		private Buffer<Entity> _contacts;
@@ -20,12 +18,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 		private IDisposable _attackDelayEndDisposable;
 
-		private List<Entity> _processedEntities;
-
-		public DealDamageOnAreaByEventSystem(Entity owner)
-		{
-			_owner = owner;
-		}
+		private List<Entity> _processedEntities;		
 
 		public void OnInit(Entity entity)
 		{
@@ -39,7 +32,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 			_processedEntities = new List<Entity>(_contacts.Items.Length);
 
-			_attackDelayEndEvent = _owner.AttackDelayEndEvent;								// ПО СОБЫТИЮ ОТ ВЛАДЕЛЬЦА ИНИЦИАТОРА ВЗРЫВА
+			_attackDelayEndEvent = entity.AttackDelayEndEvent;								
 
 			_attackDelayEndDisposable = _attackDelayEndEvent.Subscribe(OnAttackDelayEnd);
 		}
@@ -57,29 +50,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 					EntitiesHelper.TryTakeDamageFrom(_entity, contactEntity, _damage.Value);
 
-					if (_currentHealth != null)
-						_currentHealth.Value = 0;                                            // ТУТ СРАЗУ ОБНУЛЯЮ ЗДОРОВЬЕ ПЕРЕДАННОЙ СУЩНОСТИ (если есть компонент здоровья)
+					_currentHealth.Value = 0;													// ТУТ СРАЗУ ОБНУЛЯЮ ЗДОРОВЬЕ ПЕРЕДАННОЙ СУЩНОСТИ
 				}
 			}
-
-			//обработка выхода из касания
-			for (int i = _processedEntities.Count - 1; i >= 0; i--)
-				if (ContainInContacts(_processedEntities[i]) == false)
-					_processedEntities.Remove(_processedEntities[i]);
 		}
 
 		public void OnDispose()
 		{
 			_attackDelayEndDisposable.Dispose();
-		}
-
-		public bool ContainInContacts(Entity entity)
-		{
-			for (int i = 0; i < _contacts.Count; i++)
-				if (_contacts.Items[i] == entity)
-					return true;
-
-			return false;
 		}
 	}
 }

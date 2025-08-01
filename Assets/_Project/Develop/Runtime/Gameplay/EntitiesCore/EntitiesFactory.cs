@@ -20,9 +20,7 @@ using Assets._Project.Develop.Runtime.Utilities;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 {
@@ -63,7 +61,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddTakeDamageRequest()
 				.AddTakeDamageEvent()
 
-				.AddAttackKeyPressedEvent()															// ЗАПРОС НА НАЧАЛО АТАКИ
+				//.AddAttackKeyPressedEvent()															// ЗАПРОС НА НАЧАЛО АТАКИ
+				.AddIsAttackKeyPressed()                                                            // ЗАПРОС НА НАЧАЛО АТАКИ
 
 				.AddStartAttackRequest()
 				.AddStartAttackEvent()
@@ -108,9 +107,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddMustCancelAttack(mustCancelAttack);
 
 			entity
-				//.AddSystem(new AttackByMouseClickSystem())                            // УБРАТЬ! НЕ РАБОТАЕТ! ничего не сделает
-				.AddSystem(new StartAttackSystem())                                     // тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
-				.AddSystem(new BombSetupSystem(this, _mouseTrackService))				// СОЗДАЕТ БОМБУ при событии начала атаки
+				//.AddSystem(new AttackByMouseClickSystem())										// УБРАТЬ! НЕ РАБОТАЕТ! ничего не сделает
+				.AddSystem(new StartAttackSystem())													// тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
+				.AddSystem(new ExplosionSystem(_mouseTrackService, _collidersRegistryService))	// СОЗДАЕТ БОМБУ при событии начала атаки
 
 				.AddSystem(new AttackCancelSystem())
 				.AddSystem(new AttackProcessTimerSystem())
@@ -153,12 +152,23 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddContactCollidersBuffer(new Buffer<Collider>(64))
 				.AddContactEntitiesBuffer(new Buffer<Entity>(64))
 
+				.AddAttackProcessInitialTime(new ReactiveVariable<float>(0))
+				.AddAttackProcessCurrentTime()
+				.AddInAttackProcess()
+				.AddStartAttackRequest()
+				.AddStartAttackEvent()
+				.AddEndAttackEvent()
+				.AddAttackDelayTime(new ReactiveVariable<float>(0))
+				.AddAttackDelayEndEvent()
+				.AddAttackCanceledEvent()
+
 				.AddAreaContactDamage(new ReactiveVariable<float>(config.ExplosionDamage))
 				.AddAreaContactRadius(new ReactiveVariable<float>(config.ExplosionRadius))
 
 				.AddAreaContactCollidersBuffer(new Buffer<Collider>(64))
 				.AddAreaContactEntitiesBuffer(new Buffer<Entity>(64))
-				.AddIsTouchMainHero();																//Компонент на касание ГГ
+				.AddIsTouchMainHero()																//Компонент на касание ГГ
+				.AddCurrentTarget();
 
 			ICompositCondition canMove = new CompositCondition()
 				.Add(new FuncCondition(() => entity.IsDead.Value == false));
@@ -203,7 +213,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddSystem(new MainHeroTouchAreaDetectorSystem())                                   // ПРОВЕРКА на касание ГГ в ОБЛАСТИ переключается поле _isTouchMainHero
 				.AddSystem(new StartAttackSystem())                                                 // тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
 
-				.AddSystem(new DealDamageOnAreaByEventSystem(entity))                               //НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
+				.AddSystem(new DealDamageOnAreaByEventSystem())                               //НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
 
 				.AddSystem(new AttackCancelSystem())
 				.AddSystem(new AttackProcessTimerSystem())
@@ -635,7 +645,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			entity
 				.AddSystem(new AreaContactsDetectingSystem())
 				.AddSystem(new AreaContactsEntitiesFilterSystem(_collidersRegistryService))
-				.AddSystem(new DealDamageOnAreaByEventSystem(owner))								//НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
+				.AddSystem(new DealDamageOnAreaByEventSystem())										//НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
 
 				.AddSystem(new AnotherTeamAreaTouchDetectorSystem())                                //ПЕРЕКЛЮЧАЕТ компонент IsTouchAnotherTeam ПО ОБЛАСТИ (для условия смерти)
 				.AddSystem(new DeathSystem())

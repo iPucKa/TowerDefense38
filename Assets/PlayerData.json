@@ -3,7 +3,8 @@
     "Gold": 15
   },
   "ProgressData": {
-    "Win": 0,
-    "Defeat": 0
-  }
+    "Win": 3,
+    "Defeat": 11
+  },
+  "CompletedLevels": null
 }
