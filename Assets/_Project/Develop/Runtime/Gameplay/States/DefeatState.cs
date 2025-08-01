@@ -5,12 +5,15 @@ using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.DataManagement.DataProviders;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
 using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
+using System;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.States
 {
 	public class DefeatState : EndGameState, IUpdatableState
 	{
+		public event Action Defeat;
+
 		private readonly ICoroutinesPerformer _coroutinesPerformer;
 		private readonly PlayerDataProvider _playerDataProvider;
 		private readonly SceneSwitcherService _sceneSwitcherService;
@@ -34,6 +37,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			base.Enter();
 
 			Debug.Log("ПОРАЖЕНИЕ!");
+			
+			Defeat?.Invoke();
 
 			_progressService.Increase(GameProgressTypes.Defeat);
 			_coroutinesPerformer.StartPerform(_playerDataProvider.SaveAsync());

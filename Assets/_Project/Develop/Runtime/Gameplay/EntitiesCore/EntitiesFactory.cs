@@ -582,17 +582,12 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddAreaContactDamage(new ReactiveVariable<float>(config.AreaContactDamage))
 				.AddAreaContactRadius(new ReactiveVariable<float>(config.DamageRadius))
 
-				.AddIsTouchAnotherTeam()															//Компонент касания ДРУГОЙ команды
 				.AddTeam(new ReactiveVariable<Teams>(Teams.MainHero));
-
-			ICompositCondition mustDie = new CompositCondition()
-				.Add(new FuncCondition(() => entity.IsTouchAnotherTeam.Value));
 
 			ICompositCondition mustSelfRelease = new CompositCondition()
 				.Add(new FuncCondition(() => entity.IsDead.Value));
 
-			entity
-				.AddMustDie(mustDie)
+			entity				
 				.AddMustSelfRelease(mustSelfRelease);
 
 			entity
@@ -601,9 +596,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddSystem(new AreaContactsEntitiesFilterSystem(_collidersRegistryService))
 				.AddSystem(new DealDamageOnAreaContactSystem())                                     //В АПДЕЙТЕ ПРОВЕРЯЕТ ОКРУЖАЮЩИЙ БУФЕР и НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ				
 
-
-				.AddSystem(new AnotherTeamAreaTouchDetectorSystem())                                //ПЕРЕКЛЮЧАЕТ компонент IsTouchAnotherTeam ПО ОБЛАСТИ (для условия смерти)
-				.AddSystem(new DeathSystem())
 				.AddSystem(new DisableCollidersOnDeathSystem())
 				.AddSystem(new SelfReleaseSystem(_entitiesLifeContext));
 

@@ -32,6 +32,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
 			container.RegisterAsSingle(CreateGameplayPresentersFactory);
 			container.RegisterAsSingle(CreateGameplayUIRoot).NonLazy();
+			container.RegisterAsSingle(CreateGameplayScreenPresenter).NonLazy();
 			container.RegisterAsSingle(CreateGameplayPopupService);
 
 			container.RegisterAsSingle(CreateEntitiesFactory);
@@ -193,6 +194,22 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
 		//Способ создания фабрики всех презентеров геймплея
 		private static GameplayPresentersFactory CreateGameplayPresentersFactory(DIContainer c)
-			=> new GameplayPresentersFactory(c);		
+			=> new GameplayPresentersFactory(c);
+
+		//Способ создания презентера экрана геймплея
+		private static GameplayScreenPresenter CreateGameplayScreenPresenter(DIContainer c)
+		{
+			GameplayUIRoot uiRoot = c.Resolve<GameplayUIRoot>();
+
+			GameplayScreenView view = c
+				.Resolve<ViewsFactory>()
+				.Create<GameplayScreenView>(ViewIDs.GameplayScreen, uiRoot.HUDLayer);
+
+			GameplayScreenPresenter presenter = c
+				.Resolve<GameplayPresentersFactory>()
+				.CreateGameplayScreenPresenter(view);
+
+			return presenter;
+		}
 	}
 }

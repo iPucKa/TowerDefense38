@@ -90,8 +90,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack
 		public ReactiveVariable<bool> Value;
 	}
 
-	public class AttackKeyPressedEvent : IEntityComponent
+	public class IsExploded : IEntityComponent
 	{
-		public ReactiveEvent Value;
+		public ReactiveVariable<bool> Value;
 	}
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PrefabPath>k__BackingField: Entities/Fortress
   <ExplosionDamage>k__BackingField: 50
-  <ExplosionRadius>k__BackingField: 5
+  <ExplosionRadius>k__BackingField: 2
   <AttackProcessTime>k__BackingField: 0
   <AttackDelayTime>k__BackingField: 0
   <AttackCooldown>k__BackingField: 0

@@ -9,12 +9,15 @@ using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.DataManagement.DataProviders;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
 using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
+using System;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.States
 {
 	public class WinState : EndGameState, IUpdatableState
 	{
+		public event Action Win;
+
 		private readonly PlayerDataProvider _playerDataProvider;
 		private readonly SceneSwitcherService _sceneSwitcherService;
 		private readonly ICoroutinesPerformer _coroutinesPerformer;
@@ -45,6 +48,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			base.Enter();
 
 			Debug.Log("ПОБЕДА!");
+
+			Win?.Invoke();
 
 			int winValue = _configProviderService.GetConfig<GameplayConfig>().WinValue;
 			_walletService.Add(CurrencyTypes.Gold, winValue);

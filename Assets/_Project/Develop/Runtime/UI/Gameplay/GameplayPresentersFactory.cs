@@ -14,6 +14,14 @@ namespace Assets._Project.Develop.Runtime.UI.Gameplay
 			_container = container;
 		}
 
+		public GameplayScreenPresenter CreateGameplayScreenPresenter(GameplayScreenView view)
+		{
+			return new GameplayScreenPresenter(
+				view,
+				_container.Resolve<ProjectPresentersFactory>(),
+				_container.Resolve<GameplayPopupService>());
+		}
+
 		public EndGamePopupPresenter CreateEndGamePopupPresenter(EndGamePopupView view, string message)
 		{
 			return new EndGamePopupPresenter(

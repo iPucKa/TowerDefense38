@@ -1417,28 +1417,28 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 		return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsAttackKeyPressed() {Value = value}); 
 		}
 
-		public Assets._Project.Develop.Runtime.Gameplay.Features.Attack.AttackKeyPressedEvent AttackKeyPressedEventC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.Attack.AttackKeyPressedEvent>();
+		public Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsExploded IsExplodedC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsExploded>();
 
-		public Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveEvent AttackKeyPressedEvent => AttackKeyPressedEventC.Value;
+		public Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Boolean> IsExploded => IsExplodedC.Value;
 
-		public bool TryGetAttackKeyPressedEvent(out Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveEvent value)
+		public bool TryGetIsExploded(out Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Boolean> value)
 		{
-			bool result = TryGetComponent(out Assets._Project.Develop.Runtime.Gameplay.Features.Attack.AttackKeyPressedEvent component);
+			bool result = TryGetComponent(out Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsExploded component);
 			if(result)
 				value = component.Value;
 			else
-				value = default(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveEvent);
+				value = default(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Boolean>);
 			return result;
 		}
 
-		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddAttackKeyPressedEvent()
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddIsExploded()
 		{
-		return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Attack.AttackKeyPressedEvent() {Value = new Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveEvent() }); 
+		return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsExploded() {Value = new Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Boolean>() }); 
 		}
 
-		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddAttackKeyPressedEvent(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveEvent value)
+		public Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Entity AddIsExploded(Assets._Project.Develop.Runtime.Utilities.Reactive.ReactiveVariable<System.Boolean> value)
 		{
-		return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Attack.AttackKeyPressedEvent() {Value = value}); 
+		return AddComponent(new Assets._Project.Develop.Runtime.Gameplay.Features.Attack.IsExploded() {Value = value}); 
 		}
 
 		public Assets._Project.Develop.Runtime.Gameplay.Features.ApplyDamage.TakeDamageRequest TakeDamageRequestC => GetComponent<Assets._Project.Develop.Runtime.Gameplay.Features.ApplyDamage.TakeDamageRequest>();
