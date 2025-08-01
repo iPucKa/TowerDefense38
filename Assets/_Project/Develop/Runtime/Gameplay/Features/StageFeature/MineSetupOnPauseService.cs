@@ -47,7 +47,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
 			_valueForMineSetup = _configProviderService.GetConfig<GameplayConfig>().MineCostSetupValue;
 		}
 
-		public bool IsMineSetuped => _mines.Count > 0 || _walletService.Enough(CurrencyTypes.Gold, _valueForMineSetup) == false;
+		public bool IsMineSetuped => _walletService.Enough(CurrencyTypes.Gold, _valueForMineSetup) == false;
 
 		public void Update(float deltaTime)
 		{

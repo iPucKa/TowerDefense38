@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MineConfig
   m_EditorClassIdentifier: 
   <PrefabPath>k__BackingField: Entities/Mine
-  <DamageRadius>k__BackingField: 5
+  <DamageRadius>k__BackingField: 1
   <AreaContactDamage>k__BackingField: 50
   <AttackDelayTime>k__BackingField: 0.05
   <DeathProcessTime>k__BackingField: 0.05

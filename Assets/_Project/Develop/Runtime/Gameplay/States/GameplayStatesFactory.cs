@@ -58,44 +58,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 				_container.Resolve<ICoroutinesPerformer>(),
 				_container.Resolve<PlayerDataProvider>(),
 				_container.Resolve<ProgressService>());
-		}
-
-		//public GameplayStateMachine CreateGameplayStateMachine(GameplayInputArgs inputArgs)
-		//{
-		//	PreparationTriggerService preparationTriggerService = _container.Resolve<PreparationTriggerService>();
-		//	StageProviderService stageProviderService = _container.Resolve<StageProviderService>();
-		//	MainHeroHolderService mainHeroHolderService = _container.Resolve<MainHeroHolderService>();
-
-		//	GameplayStateMachine coreLoopState = CreateCoreLoopState();
-
-		//	DefeatState defeatState = CreateDefeatState();
-		//	WinState winState = CreateWinState(inputArgs);
-
-		//	ICompositCondition coreLoopToWinStateCondition = new CompositCondition()
-		//		.Add(new FuncCondition(() => preparationTriggerService.HasMainHeroContact.Value))
-		//		.Add(new FuncCondition(() => stageProviderService.CurrentStageResult.Value == StageResults.Completed))
-		//		.Add(new FuncCondition(() => stageProviderService.HasNextStage() == false));
-
-		//	ICompositCondition coreLoopToDefeatStateCondition = new CompositCondition()
-		//		.Add(new FuncCondition(() =>
-		//		{
-		//			if (mainHeroHolderService.MainHero != null)
-		//				return mainHeroHolderService.MainHero.IsDead.Value;
-
-		//			return false;
-		//		}));
-
-		//	GameplayStateMachine gameplayCycle = new GameplayStateMachine();
-
-		//	gameplayCycle.AddState(coreLoopState);
-		//	gameplayCycle.AddState(winState);
-		//	gameplayCycle.AddState(defeatState);
-
-		//	gameplayCycle.AddTransition(coreLoopState, winState, coreLoopToWinStateCondition);
-		//	gameplayCycle.AddTransition(coreLoopState, defeatState, coreLoopToDefeatStateCondition);
-
-		//	return gameplayCycle;
-		//}
+		}		
 
 		public GameplayStateMachine CreateGameplayStateMachine(GameplayInputArgs inputArgs)
 		{			
@@ -138,32 +101,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			gameplayCycle.AddTransition(coreLoopState, defeatState, coreLoopToDefeatStateCondition);
 
 			return gameplayCycle;
-		}
-
-		//public GameplayStateMachine CreateCoreLoopState()
-		//{
-		//	PreparationTriggerService preparationTriggerService = _container.Resolve<PreparationTriggerService>();
-		//	StageProviderService stageProviderService = _container.Resolve<StageProviderService>();
-
-		//	PreparationState preparationState = CreatePreparationState();
-		//	StageProcessState stageProcessState = CreateStageProcessState();
-
-		//	ICompositCondition preparationToStageProcessCondition = new CompositCondition()
-		//		.Add(new FuncCondition(() => preparationTriggerService.HasMainHeroContact.Value))
-		//		.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
-
-		//	FuncCondition stageProcessToPreparationCondition = new FuncCondition(() => stageProviderService.CurrentStageResult.Value == StageResults.Completed);
-
-		//	GameplayStateMachine coreLoopState = new GameplayStateMachine();
-
-		//	coreLoopState.AddState(preparationState);
-		//	coreLoopState.AddState(stageProcessState);
-
-		//	coreLoopState.AddTransition(preparationState, stageProcessState, preparationToStageProcessCondition);
-		//	coreLoopState.AddTransition(stageProcessState, preparationState, stageProcessToPreparationCondition);
-
-		//	return coreLoopState;
-		//}
+		}		
 
 		public GameplayStateMachine CreateCoreLoopState()
 		{
@@ -173,11 +111,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			PauseForMineSetupState pauseForMineSetupState = CreatePauseForMineSetupState();
 			StageProcessState stageProcessState = CreateStageProcessState();
 
-			ICompositCondition pauseToStageProcessCondition = new CompositCondition()
+			ICompositCondition fromPauseToStageProcessCondition = new CompositCondition()
 				.Add(new FuncCondition(() => mineSetupOnPauseService.IsMineSetuped))
 				.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
 
-			ICompositCondition stageProcessToPauseCondition = new CompositCondition()
+			ICompositCondition fromProcessToPauseCondition = new CompositCondition()
 				.Add(new FuncCondition(() => stageProviderService.CurrentStageResult.Value == StageResults.Completed))
 				.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
 
@@ -187,8 +125,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			coreLoopState.AddState(pauseForMineSetupState);
 			coreLoopState.AddState(stageProcessState);
 
-			coreLoopState.AddTransition(pauseForMineSetupState, stageProcessState, pauseToStageProcessCondition);
-			coreLoopState.AddTransition(stageProcessState, pauseForMineSetupState, stageProcessToPauseCondition);
+			coreLoopState.AddTransition(pauseForMineSetupState, stageProcessState, fromPauseToStageProcessCondition);
+			coreLoopState.AddTransition(stageProcessState, pauseForMineSetupState, fromProcessToPauseCondition);
 
 			return coreLoopState;
 		}

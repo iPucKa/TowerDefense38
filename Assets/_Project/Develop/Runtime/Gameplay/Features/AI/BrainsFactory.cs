@@ -1,6 +1,7 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
+using Assets._Project.Develop.Runtime.Gameplay.Features.TeamsFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static Unity.VisualScripting.Member;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 {
@@ -319,14 +321,41 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 
 		private AIStateMachine CreateByPlayerClickAttackStateMachine(Entity entity)
 		{
+			IReadOnlyList<Entity> entities = _entitiesLifeContext.Entities;
+
 			EmptyState emptyState = new EmptyState();
 			AttackByMouseKeyState attackByKeyState = new AttackByMouseKeyState(entity, _inputService);			
 
 			ICompositCondition fromEmptyToAttackStateCondition = new CompositCondition()
-				.Add(entity.CanStartAttack);
+				.Add(entity.CanStartAttack)
+				.Add(new FuncCondition(() =>
+				{
+					//List<Entity> entities = new List<Entity>(_entitiesLifeContext.Entities);
+					foreach (Entity entity in entities)
+					{
+						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))
+						{
+							if (team.Value == Teams.Enemies)							
+								return true;							
+						}
+					}					
+					return false;
+				}));
 
-			ICompositCondition fromAttackToEmptyStateCondition = new CompositCondition()
-				.Add(new FuncCondition(() => entity.CanStartAttack.Evaluate() == false));
+			ICompositCondition fromAttackToEmptyStateCondition = new CompositCondition()		
+				.Add(new FuncCondition(() =>
+				{
+					//List<Entity> entities = new List<Entity>(_entitiesLifeContext.Entities);
+					foreach (Entity entity in entities)
+					{
+						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))
+						{
+							if (team.Value == Teams.Enemies)
+								return false;							
+						}						
+					}
+					return true;
+				}));				
 
 			AIStateMachine stateMachine = new AIStateMachine();
 

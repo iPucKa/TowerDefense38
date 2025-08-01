@@ -87,7 +87,7 @@ namespace Assets._Project.Develop.Runtime.UI.MainMenu
 		{
 			LevelsListConfig levelsListConfig = _configsProviderService.GetConfig<LevelsListConfig>();
 
-			int levelIndex = Random.Range(1, levelsListConfig.Levels.Count);
+			int levelIndex = Random.Range(1, levelsListConfig.Levels.Count + 1);
 
 			_coroutinesPerformer.StartPerform(_sceneSwitcherService.ProcessSwitchTo(Scenes.Gameplay, new GameplayInputArgs(levelIndex)));
 		}		
