@@ -61,7 +61,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddTakeDamageRequest()
 				.AddTakeDamageEvent()
 
-				//.AddAttackKeyPressedEvent()															// ЗАПРОС НА НАЧАЛО АТАКИ
 				.AddIsAttackKeyPressed()                                                            // ЗАПРОС НА НАЧАЛО АТАКИ
 
 				.AddStartAttackRequest()
@@ -103,19 +102,19 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddMustDie(mustDie)
 				.AddMustSelfRelease(mustSelfRelease)
 				.AddCanApplyDamage(canApplyDamage)
-				.AddCanStartAttack(canStartAttack)                                      // Участвует в состоянии AttackByMouseKeyState - формирует запрос на НАЧАЛО АТАКИ по клику мышкой (и переключает состояние IsAttackKeyPressed)
+				.AddCanStartAttack(canStartAttack)													// Участвует в состоянии AttackByMouseKeyState - формирует запрос на НАЧАЛО АТАКИ по клику мышкой (и переключает состояние IsAttackKeyPressed)
 				.AddMustCancelAttack(mustCancelAttack);
 
-			entity
-				//.AddSystem(new AttackByMouseClickSystem())										// УБРАТЬ! НЕ РАБОТАЕТ! ничего не сделает
+			entity				
 				.AddSystem(new StartAttackSystem())													// тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
-				.AddSystem(new ExplosionSystem(_mouseTrackService, _collidersRegistryService))	// СОЗДАЕТ БОМБУ при событии начала атаки
+				.AddSystem(new ExplosionSystem(_mouseTrackService, _collidersRegistryService))		// СОЗДАЕТ БОМБУ при событии начала атаки
 
 				.AddSystem(new AttackCancelSystem())
 				.AddSystem(new AttackProcessTimerSystem())
 				.AddSystem(new AttackDelayEndTriggerSystem())
 				.AddSystem(new EndAttackSystem())
 				.AddSystem(new AttackCooldownTimerSystem())
+
 				.AddSystem(new ApplyDamageSystem())
 
 				.AddSystem(new DeathSystem())
@@ -149,8 +148,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddTakeDamageRequest()
 				.AddTakeDamageEvent()
 				.AddContactsDetectingMask(Layers.CharactersMask)
-				.AddContactCollidersBuffer(new Buffer<Collider>(64))
-				.AddContactEntitiesBuffer(new Buffer<Entity>(64))
 
 				.AddAttackProcessInitialTime(new ReactiveVariable<float>(0))
 				.AddAttackProcessCurrentTime()
@@ -213,7 +210,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddSystem(new MainHeroTouchAreaDetectorSystem())                                   // ПРОВЕРКА на касание ГГ в ОБЛАСТИ переключается поле _isTouchMainHero
 				.AddSystem(new StartAttackSystem())                                                 // тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
 
-				.AddSystem(new DealDamageOnAreaByEventSystem())                               //НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
+				.AddSystem(new DealDamageOnAreaByEventSystem())										//ВЗРЫВАЕТСЯ и НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ
 
 				.AddSystem(new AttackCancelSystem())
 				.AddSystem(new AttackProcessTimerSystem())
@@ -221,6 +218,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddSystem(new EndAttackSystem())
 
 				.AddSystem(new ApplyDamageSystem())
+
 				.AddSystem(new DeathSystem())
 				.AddSystem(new DisableCollidersOnDeathSystem())
 				.AddSystem(new DeathProcessTimerSystem())
@@ -612,50 +610,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			_entitiesLifeContext.Add(entity);
 
 			return entity;
-		}
-
-		public Entity CreateBomb(Vector3 position, float damage, Entity owner)
-		{
-			Entity entity = CreateEmpty();
-
-			_monoEntitiesFactory.Create(entity, position, "Entities/Projectile");
-
-			entity
-				.AddIsDead()
-				.AddContactsDetectingMask(Layers.CharactersMask)
-				.AddAreaContactCollidersBuffer(new Buffer<Collider>(64))
-				.AddAreaContactEntitiesBuffer(new Buffer<Entity>(64))
-
-				.AddAreaContactDamage(new ReactiveVariable<float>(damage))
-				.AddAreaContactRadius(new ReactiveVariable<float>(3))								//ПЕРЕНЕСТИ В КОНФИГ КРЕПОСТИ
-
-				.AddIsTouchAnotherTeam()
-				.AddTeam(new ReactiveVariable<Teams>(owner.Team.Value));
-
-			ICompositCondition mustDie = new CompositCondition()				
-				.Add(new FuncCondition(() => entity.IsTouchAnotherTeam.Value));
-
-			ICompositCondition mustSelfRelease = new CompositCondition()
-				.Add(new FuncCondition(() => entity.IsDead.Value));
-
-			entity
-				.AddMustDie(mustDie)
-				.AddMustSelfRelease(mustSelfRelease);
-
-			entity
-				.AddSystem(new AreaContactsDetectingSystem())
-				.AddSystem(new AreaContactsEntitiesFilterSystem(_collidersRegistryService))
-				.AddSystem(new DealDamageOnAreaByEventSystem())										//НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ СРАЗУ ПО СОБЫТИЮ КОНЦА АТАКИ у ВЛАДЕЛЬЦА
-
-				.AddSystem(new AnotherTeamAreaTouchDetectorSystem())                                //ПЕРЕКЛЮЧАЕТ компонент IsTouchAnotherTeam ПО ОБЛАСТИ (для условия смерти)
-				.AddSystem(new DeathSystem())
-				.AddSystem(new DisableCollidersOnDeathSystem())
-				.AddSystem(new SelfReleaseSystem(_entitiesLifeContext));
-
-			_entitiesLifeContext.Add(entity);
-
-			return entity;
-		}
+		}		
 
 		private Entity CreateEmpty() => new Entity();
 	}
