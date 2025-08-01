@@ -4,6 +4,8 @@ using Assets._Project.Develop.Runtime.Gameplay.Features.Enemies;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
 {
@@ -88,7 +90,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
 
 		private void SpawnEnemy(EnemyItemConfig enemyItemConfig)
 		{
-			Entity spawnedEnemy = _enemiesFactory.Create(enemyItemConfig.SpawnPosition, enemyItemConfig.EnemyConfig);
+			Vector3 spawnPosition = GetSpawnPointOnCircle(Vector3.zero, enemyItemConfig.SpawnRadius);
+
+			Entity spawnedEnemy = _enemiesFactory.Create(spawnPosition, enemyItemConfig.EnemyConfig);
 
 			IDisposable removeReason = spawnedEnemy.IsDead.Subscribe((oldValue, isDead) =>
 			{
@@ -101,6 +105,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
 			});
 
 			_spawnedEnemiesToRemoveReason.Add(spawnedEnemy, removeReason);
+		}
+
+		private Vector3 GetSpawnPointOnCircle(Vector3 center, float radius)
+		{
+			float angle = Random.Range(0f, Mathf.PI * 2);
+			Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+			
+			return center + offset;
 		}
 	}
 }

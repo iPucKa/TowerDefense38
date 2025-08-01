@@ -33,10 +33,10 @@ namespace Assets._Project.Develop.Runtime.GameplayMechanics
 			//_ghost = _entitiesFactory.CreateGhost(Vector3.zero + Vector3.forward * 3);
 			//_brainsFactory.CreateGhostBrain(_ghost);
 
-			_entityBlinckedHero = _entitiesFactory.CreateBlinckedHero(Vector3.zero);
+			//_entityBlinckedHero = _entitiesFactory.CreateBlinckedHero(Vector3.zero);
 			//добавить мозг Герою
 			
-			_entityHero = _entitiesFactory.CreateHero(Vector3.zero + Vector3.right * 5);
+			//_entityHero = _entitiesFactory.CreateHero(Vector3.zero + Vector3.right * 5);
 			//добавить мозг Герою
 
 			_isRunning = true;

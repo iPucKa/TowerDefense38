@@ -9,8 +9,6 @@ using Assets._Project.Develop.Runtime.Utilities.Timer;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using static Unity.VisualScripting.Member;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 {
@@ -330,7 +328,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 				.Add(entity.CanStartAttack)
 				.Add(new FuncCondition(() =>
 				{
-					//List<Entity> entities = new List<Entity>(_entitiesLifeContext.Entities);
 					foreach (Entity entity in entities)
 					{
 						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))
@@ -345,7 +342,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 			ICompositCondition fromAttackToEmptyStateCondition = new CompositCondition()		
 				.Add(new FuncCondition(() =>
 				{
-					//List<Entity> entities = new List<Entity>(_entitiesLifeContext.Entities);
 					foreach (Entity entity in entities)
 					{
 						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))

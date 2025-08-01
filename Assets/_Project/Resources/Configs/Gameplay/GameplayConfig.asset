@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: GameplayConfig
   m_EditorClassIdentifier: 
   <ValueToResetProgress>k__BackingField: 50
-  <WinValue>k__BackingField: 10
-  <DefeatValue>k__BackingField: 15
+  <WinValue>k__BackingField: 20
+  <DefeatValue>k__BackingField: 0
+  <MineCostSetupValue>k__BackingField: 5
