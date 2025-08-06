@@ -4,7 +4,6 @@ using Assets._Project.Develop.Runtime.Gameplay.Features.ApplyDamage;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Attack;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
 using Assets._Project.Develop.Runtime.Gameplay.Features.ContactTakeDamage;
-using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.LifeCycle;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MovementFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Sensors;
@@ -24,7 +23,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 		private readonly ConfigsProviderService _configProviderService;
 		private readonly EntitiesLifeContext _entitiesLifeContext;
 		private readonly CollidersRegistryService _collidersRegistryService;
-		private readonly MouseTrackService _mouseTrackService;
 		private readonly MonoEntitiesFactory _monoEntitiesFactory;
 
 		public EntitiesFactory(DIContainer container)
@@ -34,7 +32,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			_entitiesLifeContext = _container.Resolve<EntitiesLifeContext>();
 			_monoEntitiesFactory = _container.Resolve<MonoEntitiesFactory>();
 			_collidersRegistryService = _container.Resolve<CollidersRegistryService>();
-			_mouseTrackService = _container.Resolve<MouseTrackService>();
 		}
 
 		public Entity CreateFortress(Vector3 position, FortressConfig config, float maxHelth)
@@ -51,26 +48,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddDeathProcessInitialTime(new ReactiveVariable<float>(config.DeathProcessTime))
 				.AddDeathProcessCurrentTime()
 				.AddTakeDamageRequest()
-				.AddTakeDamageEvent()
-
-				.AddIsAttackKeyPressed()                                                            // ЗАПРОС НА НАЧАЛО АТАКИ
-
-				.AddStartAttackRequest()
-				.AddStartAttackEvent()
-				.AddAttackProcessInitialTime(new ReactiveVariable<float>(config.AttackProcessTime))
-				.AddAttackProcessCurrentTime()
-				.AddInAttackProcess()
-				.AddEndAttackEvent()
-				.AddAttackDelayTime(new ReactiveVariable<float>(config.AttackDelayTime))
-				.AddAttackDelayEndEvent()
-
-				.AddAreaContactDamage(new ReactiveVariable<float>(config.ExplosionDamage))         // ДАМАГ ПО ПЛОЩАДИ от БОМБ
-				.AddAreaContactRadius(new ReactiveVariable<float>(config.ExplosionRadius))
-
-				.AddAttackCanceledEvent()
-				.AddAttackCooldownInitialTime(new ReactiveVariable<float>(config.AttackCooldown))
-				.AddAttackCooldownCurrentTime()
-				.AddInAttackCooldown();
+				.AddTakeDamageEvent();
 
 			ICompositCondition mustDie = new CompositCondition()
 				.Add(new FuncCondition(() => entity.CurrentHealth.Value <= 0));
@@ -82,31 +60,12 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			ICompositCondition canApplyDamage = new CompositCondition()
 				.Add(new FuncCondition(() => entity.IsDead.Value == false));
 
-			ICompositCondition canStartAttack = new CompositCondition()								// Можно ли начинать бомбить
-				.Add(new FuncCondition(() => entity.IsDead.Value == false))
-				.Add(new FuncCondition(() => entity.InAttackProcess.Value == false))
-				.Add(new FuncCondition(() => entity.InAttackCooldown.Value == false));
-
-			ICompositCondition mustCancelAttack = new CompositCondition(LogicOperations.Or)
-				.Add(new FuncCondition(() => entity.IsDead.Value));
-
 			entity
 				.AddMustDie(mustDie)
 				.AddMustSelfRelease(mustSelfRelease)
-				.AddCanApplyDamage(canApplyDamage)
-				.AddCanStartAttack(canStartAttack)													// Участвует в состоянии AttackByMouseKeyState - формирует запрос на НАЧАЛО АТАКИ по клику мышкой (и переключает состояние IsAttackKeyPressed)
-				.AddMustCancelAttack(mustCancelAttack);
+				.AddCanApplyDamage(canApplyDamage);
 
 			entity				
-				.AddSystem(new StartAttackSystem())													// тут проверяется условие canStartAttack и формирует событие НАЧАЛА АТАКИ
-				.AddSystem(new ExplosionSystem(_mouseTrackService, _collidersRegistryService))		// СОЗДАЕТ БОМБУ при событии начала атаки
-
-				.AddSystem(new AttackCancelSystem())
-				.AddSystem(new AttackProcessTimerSystem())
-				.AddSystem(new AttackDelayEndTriggerSystem())
-				.AddSystem(new EndAttackSystem())
-				.AddSystem(new AttackCooldownTimerSystem())
-
 				.AddSystem(new ApplyDamageSystem())
 
 				.AddSystem(new DeathSystem())
@@ -117,7 +76,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 			return entity;
 		}
 
-		public Entity CreateAgroEnemy(Vector3 position, AgroEnemyConfig config)
+		public Entity CreateEnemy(Vector3 position, AgroEnemyConfig config)
 		{
 			Entity entity = CreateEmpty();
 
@@ -386,10 +345,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.EntitiesCore
 				.AddMustSelfRelease(mustSelfRelease);
 
 			entity
-
 				.AddSystem(new AreaContactsDetectingSystem())
 				.AddSystem(new AreaContactsEntitiesFilterSystem(_collidersRegistryService))
-				.AddSystem(new DealDamageOnAreaContactSystem())                                     //В АПДЕЙТЕ ПРОВЕРЯЕТ ОКРУЖАЮЩИЙ БУФЕР и НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ				
+				.AddSystem(new DealDamageOnAreaContactSystem())                                     //В АПДЕЙТЕ ПРОВЕРЯЕТ ОКРУЖАЮЩИЙ БУФЕР и НАНОСИТ УРОН СУЩНОСТЯМ ПО ПЛОЩАДИ, переключаю isDead				
 
 				.AddSystem(new DisableCollidersOnDeathSystem())
 				.AddSystem(new SelfReleaseSystem(_entitiesLifeContext));

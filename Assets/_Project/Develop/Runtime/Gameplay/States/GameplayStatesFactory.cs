@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
+using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MainHero;
 using Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
@@ -29,12 +30,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 
 		public PauseForMineSetupState CreatePauseForMineSetupState()
 		{
-			return new PauseForMineSetupState(_container.Resolve<MineSetupOnPauseService>());
+			return new PauseForMineSetupState(_container.Resolve<MineSetupService>());
 		}
 
 		public StageProcessState CreateStageProcessState()
 		{
-			return new StageProcessState(_container.Resolve<StageProviderService>());
+			return new StageProcessState(
+				_container.Resolve<StageProviderService>(),
+				_container.Resolve<ExplosionService>());
 		}
 
 		public WinState CreateWinState(GameplayInputArgs inputArgs)
@@ -105,7 +108,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 
 		public GameplayStateMachine CreateCoreLoopState()
 		{
-			MineSetupOnPauseService mineSetupOnPauseService = _container.Resolve<MineSetupOnPauseService>();
+			ExplosionService explosionService = _container.Resolve<ExplosionService>();
+			MineSetupService mineSetupOnPauseService = _container.Resolve<MineSetupService>();
+
 			StageProviderService stageProviderService = _container.Resolve<StageProviderService>();
 
 			PauseForMineSetupState pauseForMineSetupState = CreatePauseForMineSetupState();

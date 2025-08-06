@@ -9,12 +9,11 @@ using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
+namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 {
-	public class MineSetupOnPauseService
+	public class MineSetupService
 	{
 		private readonly EntitiesFactory _entitiesFactory;
-
 		private readonly IInputService _inputService;
 		private readonly MouseTrackService _mouseTrackService;
 		private readonly ICoroutinesPerformer _coroutinesPerformer;
@@ -27,7 +26,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature
 		private ReactiveVariable<bool> _isAttackKeyPressed = new();		
 		private List<Entity> _mines = new();
 
-		public MineSetupOnPauseService(
+		public MineSetupService(
 			EntitiesFactory entitiesFactory,
 			IInputService inputService,
 			MouseTrackService mouseTrackService,

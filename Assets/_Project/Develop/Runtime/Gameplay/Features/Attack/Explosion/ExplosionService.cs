@@ -1,64 +1,64 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
-using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Systems;
+﻿using Assets._Project.Develop.Runtime.Configs.Gameplay;
+using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Utilities;
+using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 {
-	public class ExplosionSystem : IInitializableSystem, IDisposableSystem
+	public class ExplosionService
 	{
-		//private readonly EntitiesFactory _entitiesFactory;
-		private readonly MouseTrackService _mouseTrackService; 
+		private readonly IInputService _inputService;
+		private readonly MouseTrackService _mouseTrackService;
 		private readonly CollidersRegistryService _colllidersRegistryService;
+		private readonly ConfigsProviderService _configProviderService;
 
-		private Entity _entity;
-		private ReactiveVariable<float> _damage;
-		private ReactiveVariable<float> _radius;
-
-		private ReactiveEvent _startAttackEvent;
-
-		private IDisposable _startAttackDisposable;
+		private readonly float _damage;
+		private readonly float _radius;
 
 		private Buffer<Collider> _contacts = new(64);
 		private Buffer<Entity> _contactsEntities = new(64);
-		
-		private List<Entity> _processedEntities;
 
-		public ExplosionSystem(
+		private ReactiveVariable<bool> _isAttackKeyPressed = new();		
+
+		public ExplosionService(
+			IInputService inputService,
 			MouseTrackService mouseTrackService,
-			CollidersRegistryService colllidersRegistryService)
+			CollidersRegistryService colllidersRegistryService,
+			ConfigsProviderService configProviderService)
 		{
+			_inputService = inputService;
 			_mouseTrackService = mouseTrackService;
 			_colllidersRegistryService = colllidersRegistryService;
+			_configProviderService = configProviderService;
+
+			_damage = _configProviderService.GetConfig<GameplayConfig>().ExplosionDamageByBomb;
+			_radius = _configProviderService.GetConfig<GameplayConfig>().ExplosionRadiusByBomb;
 		}
 
-		public void OnInit(Entity entity)
+		public void Update(float deltaTime)
 		{
-			_entity = entity;
-			_startAttackEvent = entity.StartAttackEvent;
+			if (_isAttackKeyPressed.Value == false)
+				_isAttackKeyPressed.Value = _inputService.IsAttackButtonPressed;
 
-			_damage = entity.AreaContactDamage;
-			_radius = entity.AreaContactRadius;
+			if (_isAttackKeyPressed.Value == true)
+			{
+				Detonate();
 
-			_processedEntities = new List<Entity>(_contacts.Items.Length);
-
-			_startAttackDisposable = _startAttackEvent.Subscribe(OnAttackStarted);
+				_isAttackKeyPressed.Value = false;
+			}		
 		}
 
-		private void OnAttackStarted()
+		private void Detonate()
 		{
-			//_entitiesFactory.CreateBomb(_mouseTrackService.Position, _damage.Value, _entity);
-
 			// КАПСУЛА В ПОЗИЦИИ МЫШКИ, собираю информацию по коллайдерам
 
 			_contacts.Count = Physics.OverlapCapsuleNonAlloc(
 				_mouseTrackService.Position,
 				_mouseTrackService.Position + Vector3.up * 3,
-				_radius.Value,
+				_radius,
 				_contacts.Items,
 				Layers.CharactersMask,
 				QueryTriggerInteraction.Ignore);
@@ -81,18 +81,18 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 			Debug.Log("Контакты сущностей: " + _contactsEntities.Count);
 
-			//Запрос на нанесение урона НЕДРУЖЕСТВЕННОЙ КОМАНДЕ
+			//Запрос на нанесение урона КОМАНДЕ ВРАГОВ
 			for (int i = 0; i < _contactsEntities.Count; i++)
 			{
 				Entity contactEntity = _contactsEntities.Items[i];
 
-				EntitiesHelper.TryTakeDamageFrom(_entity, contactEntity, _damage.Value);
+				EntitiesHelper.TryApplyDamageToEnemyTeam(contactEntity, _damage);
 			}
 		}
 
-		public void OnDispose()
+		public void Cleanup()
 		{
-			_startAttackDisposable.Dispose();
-		}		
+			_isAttackKeyPressed.Value = false;			
+		}
 	}
 }

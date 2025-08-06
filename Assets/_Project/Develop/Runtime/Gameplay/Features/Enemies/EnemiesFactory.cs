@@ -37,7 +37,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Enemies
 					break;
 
 				case AgroEnemyConfig agroEnemyConfig:
-					entity = _entitiesFactory.CreateAgroEnemy(position, agroEnemyConfig);
+					entity = _entitiesFactory.CreateEnemy(position, agroEnemyConfig);
 					_brainsFactory.CreateAgroEnemyBrain(entity, new MainHeroTargetSelector(entity));
 					break;				
 

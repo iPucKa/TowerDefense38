@@ -3,8 +3,8 @@ using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
 using Assets._Project.Develop.Runtime.Gameplay.Features.TeamsFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
-using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.Reactive;
+using System;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Features.MainHero
@@ -14,7 +14,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.MainHero
 		private readonly DIContainer _container;
 		private readonly EntitiesFactory _entitiesFactory;
 		private readonly BrainsFactory _brainsFactory;
-		private readonly ConfigsProviderService _configProviderService;
 		private readonly EntitiesLifeContext _entitiesLifeContext;
 
 		public MainHeroFactory(DIContainer container)
@@ -22,21 +21,28 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.MainHero
 			_container = container;
 			_entitiesFactory = _container.Resolve<EntitiesFactory>();
 			_brainsFactory = _container.Resolve<BrainsFactory>();
-			_configProviderService = _container.Resolve<ConfigsProviderService>();
 			_entitiesLifeContext = _container.Resolve<EntitiesLifeContext>();
 		}
 
-		public Entity Create(Vector3 position, float maxHelth)
+		public Entity Create(EntityConfig config, Vector3 position, float maxHelth)
 		{
-			FortressConfig fortressConfig = _configProviderService.GetConfig<FortressConfig>();
+			Entity entity;
 
-			Entity entity = _entitiesFactory.CreateFortress(position, fortressConfig, maxHelth);
+			switch (config)
+			{
+				case FortressConfig fortressConfig:
+					entity = _entitiesFactory.CreateFortress(position, fortressConfig, maxHelth);
+					
+					entity
+						.AddIsMainHero()
+						.AddTeam(new ReactiveVariable<Teams>(Teams.MainHero));
 
-			entity
-				.AddIsMainHero()
-				.AddTeam(new ReactiveVariable<Teams>(Teams.MainHero));
+					_brainsFactory.CreateFortressBrain(entity);
+					break;				
 
-			_brainsFactory.CreateFortressBrain(entity);
+				default:
+					throw new ArgumentException($"Not support {config.GetType()} type config");
+			}
 
 			_entitiesLifeContext.Add(entity);
 

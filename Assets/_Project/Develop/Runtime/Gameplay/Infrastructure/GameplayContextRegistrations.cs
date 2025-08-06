@@ -2,6 +2,7 @@
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore.Mono;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
+using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
 using Assets._Project.Develop.Runtime.Gameplay.Features.Enemies;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MainHero;
@@ -49,7 +50,10 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 			container.RegisterAsSingle(CreateStagesFactory);
 			container.RegisterAsSingle(CreateStageProviderService);
 			container.RegisterAsSingle(CreatePreparationTriggerService);
-			container.RegisterAsSingle(CreateMineSetupOnPauseService);
+
+			container.RegisterAsSingle(CreateMineSetupService);
+			container.RegisterAsSingle(CreateExplosionService);
+
 			container.RegisterAsSingle(CreateMainHeroHolderService).NonLazy();
 			container.RegisterAsSingle(CreateGameplayStatesFactory);
 			container.RegisterAsSingle(CreateGameplayStatesContext);
@@ -81,10 +85,10 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 				c.Resolve<EntitiesLifeContext>());
 		}
 
-		//Способ создания сервиса паузы для установки мин по клику мышкой
-		private static MineSetupOnPauseService CreateMineSetupOnPauseService(DIContainer c)
+		//Способ создания сервиса для установки мин по клику мышкой
+		private static MineSetupService CreateMineSetupService(DIContainer c)
 		{
-			return new MineSetupOnPauseService(
+			return new MineSetupService(
 				c.Resolve<EntitiesFactory>(),
 				c.Resolve<IInputService>(),
 				c.Resolve<MouseTrackService>(),
@@ -92,6 +96,16 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 				c.Resolve<ICoroutinesPerformer>(),
 				c.Resolve<ConfigsProviderService>(),
 				c.Resolve<WalletService>());
+		}
+
+		//Способ создания сервиса для взрывов по клику мишью
+		private static ExplosionService CreateExplosionService (DIContainer c)
+		{
+			return new ExplosionService(
+				c.Resolve<IInputService>(),
+				c.Resolve<MouseTrackService>(),
+				c.Resolve<CollidersRegistryService>(),
+				c.Resolve<ConfigsProviderService>());
 		}
 
 		//Способ создания сервиса работы с волнами

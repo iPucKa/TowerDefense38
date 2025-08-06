@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: GameplayConfig
   m_EditorClassIdentifier: 
   <ValueToResetProgress>k__BackingField: 50
-  <WinValue>k__BackingField: 20
+  <WinValue>k__BackingField: 50
   <DefeatValue>k__BackingField: 0
+  <ExplosionDamageByBomb>k__BackingField: 50
+  <ExplosionRadiusByBomb>k__BackingField: 2
   <MineCostSetupValue>k__BackingField: 5

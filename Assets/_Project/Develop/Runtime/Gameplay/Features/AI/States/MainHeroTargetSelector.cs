@@ -20,15 +20,15 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
 		{
 			IEnumerable<Entity> selectedTargets = SelectorHelper.InitialFilteredTargetsFrom(targets, _source);
 
+			if (selectedTargets == null)
+				return null;
+
 			Entity mainHero = selectedTargets.First();
 
 			foreach (Entity target in selectedTargets)
 			{
-				if (target.HasComponent<IsMainHero>())
-				{
-					mainHero = target;
-					break;
-				}
+				if (target.HasComponent<IsMainHero>())				
+					mainHero = target;				
 			}
 
 			return mainHero;

@@ -1,13 +1,13 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
 using Assets._Project.Develop.Runtime.Utilities.StateMachineCore;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.States
 {
 	public class PauseForMineSetupState : State, IUpdatableState
 	{
-		private readonly MineSetupOnPauseService _mineSetupOnPauseService;
+		private readonly MineSetupService _mineSetupOnPauseService;
 
-		public PauseForMineSetupState(MineSetupOnPauseService mineSetupOnPauseService)
+		public PauseForMineSetupState(MineSetupService mineSetupOnPauseService)
 		{
 			_mineSetupOnPauseService = mineSetupOnPauseService;
 		}

@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Configs.Gameplay.Levels;
+﻿using Assets._Project.Develop.Runtime.Configs.Gameplay.Entities;
+using Assets._Project.Develop.Runtime.Configs.Gameplay.Levels;
 using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MainHero;
@@ -18,6 +19,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 	{
 		private DIContainer _container;
 		private GameplayInputArgs _inputArgs;
+		private ConfigsProviderService _configProviderService;
 
 		private WalletService _walletService;
 
@@ -44,6 +46,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
 			Debug.Log("Инициализация геймплейной сцены");
 
+			_configProviderService = _container.Resolve<ConfigsProviderService>();
+
 			_walletService = _container.Resolve<WalletService>();
 
 			_entitiesLifeContext = _container.Resolve<EntitiesLifeContext>();
@@ -55,7 +59,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
 			LevelConfig levelConfig = _container.Resolve<ConfigsProviderService>().GetConfig<LevelsListConfig>().GetBy(_inputArgs.LevelNumber);
 
-			_container.Resolve<MainHeroFactory>().Create(Vector3.zero, levelConfig.FortressHealth);
+			FortressConfig fortressConfig = _configProviderService.GetConfig<FortressConfig>();
+
+			_container.Resolve<MainHeroFactory>().Create(fortressConfig, Vector3.zero, levelConfig.FortressHealth);
 
 			yield break;
 		}

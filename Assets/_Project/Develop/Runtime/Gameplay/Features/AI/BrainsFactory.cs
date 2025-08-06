@@ -1,6 +1,7 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.EntitiesCore;
 using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
+using Assets._Project.Develop.Runtime.Gameplay.Features.MovementFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.TeamsFeature;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.Conditions;
@@ -31,7 +32,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 
 		public StateMachineBrain CreateFortressBrain(Entity entity)
 		{
-			AIStateMachine behaviour = CreateByPlayerClickAttackStateMachine(entity);			
+			EmptyState emptyState = new EmptyState();						
+
+			AIStateMachine behaviour = new AIStateMachine();
+
+			behaviour.AddState(emptyState);						
 
 			StateMachineBrain brain = new StateMachineBrain(behaviour);
 
@@ -46,7 +51,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 
 			AttackTriggerState attackTriggerState = new AttackTriggerState(entity);
 
-			ICondition fromMovementToAttackCondition = entity.CanStartAttack;
+			ReactiveVariable<Entity> currentTarget = entity.CurrentTarget;
+
+			ICompositCondition fromMovementToAttackCondition = new CompositCondition()
+				.Add(new FuncCondition(() => entity.CurrentTarget.Value != null))
+				.Add(entity.CanStartAttack);
+
+			ICompositCondition fromAttackToMovementCondition = new CompositCondition()
+				.Add(new FuncCondition(() => entity.CurrentTarget.Value == null));
 
 			AIStateMachine rootStateMachine = new AIStateMachine();
 
@@ -54,6 +66,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 			rootStateMachine.AddState(attackTriggerState);
 
 			rootStateMachine.AddTransition(movementState, attackTriggerState, fromMovementToAttackCondition);
+			rootStateMachine.AddTransition(attackTriggerState, movementState, fromAttackToMovementCondition);
 
 			StateMachineBrain brain = new StateMachineBrain(rootStateMachine);
 
@@ -322,7 +335,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 			IReadOnlyList<Entity> entities = _entitiesLifeContext.Entities;
 
 			EmptyState emptyState = new EmptyState();
-			AttackByMouseKeyState attackByKeyState = new AttackByMouseKeyState(entity, _inputService);			
+			AttackByMouseKeyState attackByKeyState = new AttackByMouseKeyState(entity, _inputService);
 
 			ICompositCondition fromEmptyToAttackStateCondition = new CompositCondition()
 				.Add(entity.CanStartAttack)
@@ -332,14 +345,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 					{
 						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))
 						{
-							if (team.Value == Teams.Enemies)							
-								return true;							
+							if (team.Value == Teams.Enemies)
+								return true;
 						}
-					}					
+					}
 					return false;
 				}));
 
-			ICompositCondition fromAttackToEmptyStateCondition = new CompositCondition()		
+			ICompositCondition fromAttackToEmptyStateCondition = new CompositCondition()
 				.Add(new FuncCondition(() =>
 				{
 					foreach (Entity entity in entities)
@@ -347,11 +360,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI
 						if (entity.TryGetTeam(out ReactiveVariable<Teams> team))
 						{
 							if (team.Value == Teams.Enemies)
-								return false;							
-						}						
+								return false;
+						}
 					}
 					return true;
-				}));				
+				}));
 
 			AIStateMachine stateMachine = new AIStateMachine();
 

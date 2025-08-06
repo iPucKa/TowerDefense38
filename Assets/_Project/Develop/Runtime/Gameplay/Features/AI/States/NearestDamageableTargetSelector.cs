@@ -20,6 +20,9 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.AI.States
 		{
 			IEnumerable<Entity> selectedTargets = SelectorHelper.InitialFilteredTargetsFrom(targets, _source);
 
+			if (selectedTargets.Any() == false)
+				return null;
+
 			Entity closestTarget = selectedTargets.First();
 			float minDistance = GetDistanceTo(closestTarget);
 
