@@ -25,7 +25,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 
 			_isDead = entity.IsDead;
 
-			_damagedEntities = new List<Entity>(_contacts.Items.Length);
+			//_damagedEntities = new List<Entity>(_contacts.Items.Length);
 		}
 
 		public void OnUpdate(float deltaTime)
@@ -40,7 +40,10 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 			}
 
 			if (_damagedEntities.Count != 0)
-				_isDead.Value = true;			
+			{
+				_isDead.Value = true;
+				_damagedEntities.Clear();
+			}			
 		}		
 	}
 }
