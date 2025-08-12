@@ -46,7 +46,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion
 			_valueForMineSetup = _configProviderService.GetConfig<GameplayConfig>().MineCostSetupValue;
 		}
 
-		public bool IsMineSetuped => _mines.Count >= 2 || _walletService.Enough(CurrencyTypes.Gold, _valueForMineSetup) == false;
+		public bool HasNoMoney => _walletService.Enough(CurrencyTypes.Gold, _valueForMineSetup) == false;
 
 		public void Update(float deltaTime)
 		{

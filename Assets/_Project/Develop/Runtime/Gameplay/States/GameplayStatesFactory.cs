@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Features.AI.States;
+using Assets._Project.Develop.Runtime.Gameplay.Features.Attack.Explosion;
 using Assets._Project.Develop.Runtime.Gameplay.Features.InputFeature;
 using Assets._Project.Develop.Runtime.Gameplay.Features.MainHero;
 using Assets._Project.Develop.Runtime.Gameplay.Features.StageFeature;
@@ -11,6 +12,9 @@ using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.DataManagement.DataProviders;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
+using Assets._Project.Develop.Runtime.Utilities.Timer;
+using System;
+using System.Collections.Generic;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.States
 {
@@ -111,20 +115,30 @@ namespace Assets._Project.Develop.Runtime.Gameplay.States
 			ExplosionService explosionService = _container.Resolve<ExplosionService>();
 			MineSetupService mineSetupOnPauseService = _container.Resolve<MineSetupService>();
 
+			List<IDisposable> disposables = new List<IDisposable>();
+
 			StageProviderService stageProviderService = _container.Resolve<StageProviderService>();
+			TimerServiceFactory timerServiceFactory = _container.Resolve<TimerServiceFactory>();
+
 
 			PauseForMineSetupState pauseForMineSetupState = CreatePauseForMineSetupState();
 			StageProcessState stageProcessState = CreateStageProcessState();
 
-			ICompositCondition fromPauseToStageProcessCondition = new CompositCondition()
-				.Add(new FuncCondition(() => mineSetupOnPauseService.IsMineSetuped))
-				.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
+			TimerService mineSetupTimer = timerServiceFactory.Create(10f);
+			disposables.Add(mineSetupTimer);
+			disposables.Add(pauseForMineSetupState.Entered.Subscribe(mineSetupTimer.Restart));
+
+			ICompositCondition fromPauseToStageProcessCondition = new CompositCondition(LogicOperations.Or)
+				.Add(new FuncCondition(() => mineSetupTimer.IsOver))
+				.Add(new FuncCondition(() => mineSetupOnPauseService.HasNoMoney));
+
+			//fromPauseToStageProcessCondition.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
 
 			ICompositCondition fromProcessToPauseCondition = new CompositCondition()
 				.Add(new FuncCondition(() => stageProviderService.CurrentStageResult.Value == StageResults.Completed))
 				.Add(new FuncCondition(() => stageProviderService.HasNextStage()));
 
-			GameplayStateMachine coreLoopState = new GameplayStateMachine();
+			GameplayStateMachine coreLoopState = new GameplayStateMachine(disposables);
 
 			//coreLoopState.AddState(preparationState);
 			coreLoopState.AddState(pauseForMineSetupState);
